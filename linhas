@@ -1,0 +1,51 @@
+# Instale se necessário
+if (!require(e1071)) install.packages("e1071")
+library(e1071)
+
+# Dados
+dados <- data.frame(
+  Phi   = c(0, 1, 2, 3, 4, 5),
+  FN_01 = c(0.26, 1.89, 26.30, 70.32, 0.39, 0.85),
+  FN_02 = c(0.30, 2.00, 25.00, 68.00, 2.00, 2.70),
+  FN_03 = c(0.20, 1.50, 30.00, 65.00, 2.00, 1.30),
+  FN_04 = c(0.15, 1.20, 28.50, 68.90, 0.60, 0.65),
+  FN_05 = c(0.25, 2.10, 27.00, 68.50, 1.50, 0.65),
+  FN_06 = c(0.35, 1.80, 26.50, 68.00, 2.10, 1.25),
+  FN_07 = c(0.40, 1.70, 29.00, 65.00, 2.50, 1.40),
+  FN_08 = c(0.22, 1.95, 27.30, 66.20, 2.00, 2.33),
+  FN_09 = c(0.31, 2.10, 28.00, 65.50, 2.50, 1.59),
+  FN_10 = c(0.28, 2.20, 25.50, 67.50, 2.00, 2.52)
+)
+
+amostras <- names(dados)[-1]
+
+for (amostra in amostras) {
+  phi <- dados$Phi
+  freq <- dados[[amostra]]
+  freq_rel <- freq / sum(freq)  # normaliza
+  
+  # Abrir nova janela gráfica
+  windows()  # use x11() no Linux
+  
+  # Criar histograma
+  pos <- barplot(freq_rel,
+                 names.arg = phi,
+                 col = "blue",
+                 xlab = "Phi (granulometria)",
+                 ylab = "Freq. relativa",
+                 main = paste("Histograma com Curva -", amostra),
+                 ylim = c(0, max(freq_rel) + 0.05))
+  lines(pos, freq_rel, type = "o", col = "red", lwd = 2, pch = 16)
+  
+  # Estatísticas
+  media <- sum(phi * freq_rel)
+  desvio <- sqrt(sum(freq_rel * (phi - media)^2))
+  assimetria <- sum(freq_rel * (phi - media)^3) / desvio^3
+  curtose <- sum(freq_rel * (phi - media)^4) / desvio^4
+  
+  # Mostrar no console
+  cat("===== ", amostra, " =====\n")
+  cat("Média (phi):", round(media, 2), "\n")
+  cat("Desvio padrão:", round(desvio, 2), "\n")
+  cat("Assimetria:", round(assimetria, 2), "\n")
+  cat("Curtose:", round(curtose, 2), "\n\n")
